@@ -84,13 +84,8 @@ export const parseCSV = ({ value }: { value: string; mime?: string }) => {
   for (let i = 0; i < characters.length; i++) {
     const character = characters[i];
     const nextIndex = i + 1;
-    const nextCharacter = characters[nextIndex];
 
-    if (
-      character === '/' &&
-      nextCharacter === 'n' &&
-      uncollectedField[0] !== '"'
-    ) {
+    if (character === '\n' && uncollectedField[0] !== '"') {
       // push last collected character
       uncollectedColumn.push(escapeSpecialCharacters(uncollectedField));
       // push column to output
@@ -99,7 +94,6 @@ export const parseCSV = ({ value }: { value: string; mime?: string }) => {
       // reset
       uncollectedColumn = [];
       uncollectedField = '';
-      i++; // Skip the 'n' character
       continue;
     }
 
@@ -111,9 +105,8 @@ export const parseCSV = ({ value }: { value: string; mime?: string }) => {
       continue;
     }
 
-    if (character === '/' && nextCharacter === 'n') {
-      uncollectedField += '/n';
-      i++; // Skip the 'n' character
+    if (character === '\n') {
+      uncollectedField += '\n';
       continue;
     }
 

@@ -1,9 +1,20 @@
 import { useState } from 'react';
+import { parseCSV } from './parseCSV/parseCSV';
+
+const Row = ({ column }: { column: Array<string> }) => {
+  return (
+    <tr>
+      {column.map((cell) => (
+        <th>{cell}</th>
+      ))}
+    </tr>
+  );
+};
 
 function App() {
   const [value, setValue] = useState('Your value');
 
-  console.log(value);
+  const parsedCSV = parseCSV({ value });
 
   return (
     <>
@@ -14,7 +25,11 @@ function App() {
           setValue(e.target.value);
         }}
       />
-      <p>{value}</p>
+      <table>
+        {parsedCSV.map((column) => (
+          <Row column={column} />
+        ))}
+      </table>
     </>
   );
 }
