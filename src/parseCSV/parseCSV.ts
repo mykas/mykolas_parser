@@ -80,13 +80,19 @@ export const parseCSV = ({ value }: { value: string; mime?: string }) => {
   const output = [];
   let uncollectedColumn = [];
   let uncollectedField = '';
+  let uncollectedFieldDoubleQuoted = false;
 
   for (let i = 0; i < characters.length; i++) {
     const character = characters[i];
     const nextIndex = i + 1;
+    const nextCharacter = characters[nextIndex];
 
-    if (character === '\n' && uncollectedField[0] !== '"') {
-      // push last collected character
+    if (uncollectedField === '"') {
+      uncollectedFieldDoubleQuoted = true;
+    }
+
+    if (character === '\n' && uncollectedFieldDoubleQuoted === false) {
+      // push last collected field
       uncollectedColumn.push(escapeSpecialCharacters(uncollectedField));
       // push column to output
       output.push(uncollectedColumn);
@@ -97,16 +103,30 @@ export const parseCSV = ({ value }: { value: string; mime?: string }) => {
       continue;
     }
 
+    if (
+      character === '"' &&
+      uncollectedFieldDoubleQuoted &&
+      nextCharacter === '\n'
+    ) {
+      uncollectedField += character;
+      // push last collected field
+      uncollectedColumn.push(escapeSpecialCharacters(uncollectedField));
+      // push column to output
+      output.push(uncollectedColumn);
+
+      // reset
+      uncollectedColumn = [];
+      uncollectedField = '';
+      uncollectedFieldDoubleQuoted = false;
+      i++; // skip the \n character.
+      continue;
+    }
+
     if (character === ',') {
       // finish collecting character
       uncollectedColumn.push(escapeSpecialCharacters(uncollectedField));
       // reset
       uncollectedField = '';
-      continue;
-    }
-
-    if (character === '\n') {
-      uncollectedField += '\n';
       continue;
     }
 

@@ -44,14 +44,23 @@ describe('parseCSV', () => {
   });
 
   it('Fields containing line breaks (CRLF) should be enclosed in double-quotes', () => {
-    const value = '"aaa","b/nbb","ccc"';
+    const value = '"aaa","b\nbb","ccc"';
     const parsedValue = parseCSV({ value });
-    expect(parsedValue).toStrictEqual([['"aaa"', '"b/nbb"', '"ccc"']]);
+    expect(parsedValue).toStrictEqual([['"aaa"', '"b\nbb"', '"ccc"']]);
   });
 
   it('Fields containing commas should be enclosed in double-quotes', () => {
     const value = '"aaa","b.bb","ccc"';
     const parsedValue = parseCSV({ value });
     expect(parsedValue).toStrictEqual([['"aaa"', '"b.bb"', '"ccc"']]);
+  });
+
+  it('Fields containing commas and new lines should just work', () => {
+    const value = '"aaa","bbb"\n"ccc","ddd"';
+    const parsedValue = parseCSV({ value });
+    expect(parsedValue).toStrictEqual([
+      ['"aaa"', '"bbb"'],
+      ['"ccc"', '"ddd"'],
+    ]);
   });
 });
