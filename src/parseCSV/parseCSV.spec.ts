@@ -2,7 +2,7 @@ import { parseCSV } from './parseCSV';
 
 describe('parseCSV', () => {
   it('Each record is located on a separate line, delimited by a line break (CRLF)', () => {
-    const value = 'aaa,bbb,ccc/nzzz,yyy,xxx/n';
+    const value = 'aaa,bbb,ccc\nzzz,yyy,xxx\n';
     const parsedValue = parseCSV({ value });
     expect(parsedValue).toStrictEqual([
       ['aaa', 'bbb', 'ccc'],
@@ -11,7 +11,7 @@ describe('parseCSV', () => {
   });
 
   it('The last record in the file may or may not have an ending line break.', () => {
-    const value = 'aaa,bbb,ccc/nzzz,yyy,xxx';
+    const value = 'aaa,bbb,ccc\nzzz,yyy,xxx';
     const parsedValue = parseCSV({ value });
     expect(parsedValue).toStrictEqual([
       ['aaa', 'bbb', 'ccc'],

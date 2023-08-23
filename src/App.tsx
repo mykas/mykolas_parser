@@ -16,6 +16,8 @@ function App() {
 
   const parsedCSV = parseCSV({ value });
 
+  console.log(parsedCSV);
+
   return (
     <>
       <textarea
