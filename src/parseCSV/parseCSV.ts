@@ -53,8 +53,7 @@
        "aaa","b""bb","ccc"
  */
 
-export const parseCSV = ({ value }: { value: string; mime?: string }) => {
-  // const hasHeader = mime === 'text/csv; header=present';
+export const parseCSV = ({ value }: { value: string }) => {
   const characters = value.split('');
 
   const output = [];
