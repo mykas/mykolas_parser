@@ -53,26 +53,6 @@
        "aaa","b""bb","ccc"
  */
 
-const escapeSpecialCharacters = (value: string) => {
-  // Check if the value contains double-quote characters
-  if (value.includes('"')) {
-    // Split the value into an array of characters
-    const chars = value.split('');
-
-    // Loop through the characters and escape double-quotes that are not first or last
-    for (let i = 1; i < chars.length - 1; i++) {
-      if (chars[i] === '"') {
-        chars[i] = '""'; // Escape the double-quote
-      }
-    }
-
-    // Join the characters back into a string
-    return chars.join('');
-  }
-
-  return value; // Return the original value if no escaping is needed
-};
-
 export const parseCSV = ({ value }: { value: string; mime?: string }) => {
   // const hasHeader = mime === 'text/csv; header=present';
   const characters = value.split('');
@@ -81,28 +61,35 @@ export const parseCSV = ({ value }: { value: string; mime?: string }) => {
   let uncollectedColumn = [];
   let uncollectedField = '';
   let uncollectedFieldDoubleQuoted = false;
+  const resetUncollected = () => {
+    uncollectedColumn = [];
+    uncollectedField = '';
+    uncollectedFieldDoubleQuoted = false;
+  };
 
   for (let i = 0; i < characters.length; i++) {
     const character = characters[i];
     const nextIndex = i + 1;
     const nextCharacter = characters[nextIndex];
 
+    // this is where we switch logic based on double quotes
     if (uncollectedField === '"') {
       uncollectedFieldDoubleQuoted = true;
     }
 
+    // column push for non quoted fields
     if (character === '\n' && uncollectedFieldDoubleQuoted === false) {
       // push last collected field
-      uncollectedColumn.push(escapeSpecialCharacters(uncollectedField));
+      uncollectedColumn.push(uncollectedField);
       // push column to output
       output.push(uncollectedColumn);
 
       // reset
-      uncollectedColumn = [];
-      uncollectedField = '';
+      resetUncollected();
       continue;
     }
 
+    // column push for double quoted fields
     if (
       character === '"' &&
       uncollectedFieldDoubleQuoted &&
@@ -110,21 +97,19 @@ export const parseCSV = ({ value }: { value: string; mime?: string }) => {
     ) {
       uncollectedField += character;
       // push last collected field
-      uncollectedColumn.push(escapeSpecialCharacters(uncollectedField));
+      uncollectedColumn.push(uncollectedField);
       // push column to output
       output.push(uncollectedColumn);
 
       // reset
-      uncollectedColumn = [];
-      uncollectedField = '';
-      uncollectedFieldDoubleQuoted = false;
+      resetUncollected();
       i++; // skip the \n character.
       continue;
     }
 
     if (character === ',') {
       // finish collecting character
-      uncollectedColumn.push(escapeSpecialCharacters(uncollectedField));
+      uncollectedColumn.push(uncollectedField);
       // reset
       uncollectedField = '';
       continue;
@@ -135,8 +120,8 @@ export const parseCSV = ({ value }: { value: string; mime?: string }) => {
       // append last character
       uncollectedField += character;
 
-      // push last collected character
-      uncollectedColumn.push(escapeSpecialCharacters(uncollectedField));
+      // push last collected field
+      uncollectedColumn.push(uncollectedField);
 
       // push column to output
       output.push(uncollectedColumn);

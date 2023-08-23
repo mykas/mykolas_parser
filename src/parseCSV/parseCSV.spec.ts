@@ -32,7 +32,7 @@ describe('parseCSV', () => {
   });
 
   it('If double-quotes are used to enclose fields, then a double-quote appearing inside a field must be escaped by preceding it with another double quote', () => {
-    const value = '"aaa","b"bb","ccc"';
+    const value = '"aaa","b""bb","ccc"';
     const parsedValue = parseCSV({ value });
     expect(parsedValue).toStrictEqual([['"aaa"', '"b""bb"', '"ccc"']]);
   });
